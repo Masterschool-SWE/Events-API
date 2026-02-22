@@ -21,7 +21,7 @@ def get_current_user():
 @rsvps_bp.route('/event/<int:event_id>', methods=['POST'])
 def rsvp(event_id):
     """RSVP to an event with different access requirements"""
-    event = Event.query.get_or_404(event_id)
+    event = db.get_or_404(Event, event_id)
     data = request.get_json() or {}
     
     user_id, is_admin = get_current_user()
@@ -46,8 +46,8 @@ def rsvp(event_id):
     # Check if user already RSVP'd
     existing_rsvp = None
     if user_id:
-        existing_rsvp = RSVP.query.filter_by(event_id=event_id, user_id=user_id).first()
-    
+        existing_rsvp = db.session.execute(db.select(RSVP).filter_by(event_id=event_id, user_id=user_id)).scalar_one_or_none()
+
     # Default to attending=True if not specified
     attending = data.get('attending', True)
     
@@ -70,9 +70,9 @@ def rsvp(event_id):
 @rsvps_bp.route('/event/<int:event_id>', methods=['GET'])
 def get_rsvps(event_id):
     """Get all RSVPs for an event"""
-    event = Event.query.get_or_404(event_id)
-    rsvps = RSVP.query.filter_by(event_id=event_id).all()
-    
+    event = db.get_or_404(Event, event_id)
+    rsvps = db.session.execute(db.select(RSVP).filter_by(event_id=event_id)).scalars().all()
+
     attending_count = len([r for r in rsvps if r.attending])
     not_attending_count = len([r for r in rsvps if not r.attending])
     
