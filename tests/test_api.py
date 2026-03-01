@@ -179,7 +179,7 @@ def test_rsvp_fails_without_auth(base_url, auth_token):
         "date": "2026-01-20T18:00:00",
         "location": "Room 1",
         "capacity": 50,
-        "is_public": True,
+        "is_public": False,
         "requires_admin": False
     }
 
@@ -198,3 +198,5 @@ def test_rsvp_fails_without_auth(base_url, auth_token):
     )
 
     assert response.status_code == 401
+
+
