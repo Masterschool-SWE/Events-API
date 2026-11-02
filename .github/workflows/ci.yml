@@ -21,7 +21,6 @@ jobs:
       - name: Start Events API container
         run: docker run -d -p 5000:5000 --name events-api-ci events-api:latest
 
-
       - name: Check API health
         run: |
           for i in {1..10}; do
@@ -34,3 +33,23 @@ jobs:
           done
           echo "Events API health check failed!"
           exit 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests
+
+      - name: Run pytest tests
+        run: python -m pytest tests/ -v
+
+      - name: Stop and remove Docker container
+        if: always()
+        run: |
+          docker stop events-api-ci || true
+          docker rm events-api-ci || true
