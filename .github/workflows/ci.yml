@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,3 +17,20 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t events-api:latest .
+
+      - name: Start Events API container
+        run: docker run -d -p 5000:5000 --name events-api-ci events-api:latest
+
+
+      - name: Check API health
+        run: |
+          for i in {1..10}; do
+            if curl --fail --silent http://localhost:5000/api/health; then
+              echo "Events API is healthy!"
+              exit 0
+            fi
+            echo "Waiting for Events API..."
+            sleep 2
+          done
+          echo "Events API health check failed!"
+          exit 1
