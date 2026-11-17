@@ -40,6 +40,7 @@ TEST_EVENT = {
 @pytest.fixture(autouse=True)
 def user_to_test():
     """
+    make your test data, run the riot, delete the trash.
     create test data for user and event
     clear database after testing is done
     """
