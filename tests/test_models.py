@@ -11,9 +11,7 @@ def app():
     app = create_app()
 
     with app.app_context():
-        db.create_all()  # Tabellen für die Tests anlegen
         yield app  # Hier läuft der eigentliche Test
-        db.drop_all()  # Danach alles wieder aufräumen
 
 @pytest.fixture
 def test_user():
