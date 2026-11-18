@@ -93,7 +93,7 @@ def event_to_test():
         yield event.id
 
         # Cleanup database: Test Event
-        event = Event.query.get(event_id)
+        event = db.session.get(Event, event_id)
         if event:
             db.session.delete(event)
             db.session.commit()
