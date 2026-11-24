@@ -10,20 +10,12 @@ jobs:
 
     steps:
 
-# TODO:
-# Pipeline lokal ausführen
-# merge main unterbinden, wenn Tests fehl schlagen
-#
-#
-#
-
       - name: Show available tools
         run: |
           uname -a
-          python3 --version
-          pip3 --version || true
-          which docker git curl jq gh
-          ls -la /opt/hostedtoolcache/Python 2>/dev/null || true
+          for cmd in python3 pip3 docker git curl jq gh; do
+            printf "%-10s %s\n" "$cmd:" "$(command -v "$cmd" || echo 'not found')"
+          done
 
       - name: Checkout repository
         uses: actions/checkout@v4
