@@ -13,7 +13,7 @@ def get_events():
 
 @events_bp.route('/<int:event_id>', methods=['GET'])
 def get_event(event_id):
-    """Get a specific event"""
+    """Get a specific event by event_id"""
     event = Event.query.get_or_404(event_id)
     return jsonify(event.to_dict()), 200
 
