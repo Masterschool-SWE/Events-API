@@ -10,6 +10,14 @@ jobs:
 
     steps:
 
+# TODO:
+# Health Check
+# Pipeline lokal ausführen
+# merge main unterbinden, wenn Tests fehl schlagen
+#
+#
+#
+
       - name: Show available tools
         run: |
           uname -a
@@ -17,7 +25,12 @@ jobs:
           pip3 --version || true
           which docker git curl jq gh
           ls -la /opt/hostedtoolcache/Python 2>/dev/null || true
-          dpkg -l | awk '{print $2, $3}'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,6 +47,23 @@ jobs:
             echo "::error::Docker-Image-Build ist fehlgeschlagen (Commit ${{ github.sha }})."
             exit 1
           fi
+
+      - name: Health check containerized API
+        run: |
+          docker run -d --name api-healthcheck-${{ github.sha }} -p 5000:5000 app-test:${{ github.sha }}
+          trap "docker rm -f api-healthcheck-${{ github.sha }} 2>/dev/null || true" EXIT
+
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5000/api/health; then
+              echo ""
+              exit 0
+            fi
+            sleep 0.5
+          done
+
+          echo "::error::Containerisierte API auf /api/health nicht erreichbar."
+          docker logs api-healthcheck-${{ github.sha }} || true
+          exit 1
 
       - name: Run test_models.py inside Docker container
         run: |
@@ -58,3 +88,9 @@ jobs:
 
             pytest ./tests/test_api.py
           '
+
+      - name: cleanup
+        if: always()
+        run: |
+          docker rmi app-test:${{ github.sha }} 2>/dev/null || true
+          docker image prune -f
