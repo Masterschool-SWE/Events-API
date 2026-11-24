@@ -26,17 +26,17 @@ jobs:
           which docker git curl jq gh
           ls -la /opt/hostedtoolcache/Python 2>/dev/null || true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: check checkout
         run: ls -lisa
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
