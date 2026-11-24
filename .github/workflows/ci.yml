@@ -1,0 +1,30 @@
+name: CI - Docker Build & Pytest
+
+on:
+  push:
+    branches: ["**"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          if ! docker build -t app-test:${{ github.sha }} .; then
+            echo "::error::Docker-Image-Build ist fehlgeschlagen (Commit ${{ github.sha }})."
+            exit 1
+          fi
+
+      - name: Run pytest inside Docker container
+        run: |
+          if ! docker run --rm app-test:${{ github.sha }} pytest; then
+            echo "::error::pytest im Docker-Container ist fehlgeschlagen."
+            exit 1
+          fi
