@@ -46,5 +46,5 @@ jobs:
               sleep 0.5
             done
 
-            pytest ./tests/test_models.py
+            pytest ./tests/test_api.py
           '
