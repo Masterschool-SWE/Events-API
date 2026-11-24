@@ -9,6 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Show available tools
+        run: |
+          uname -a
+          python3 --version
+          pip3 --version || true
+          which docker git curl jq gh
+          ls -la /opt/hostedtoolcache/Python 2>/dev/null || true
+          dpkg -l | awk '{print $2, $3}'
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
